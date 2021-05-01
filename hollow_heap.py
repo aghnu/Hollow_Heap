@@ -31,6 +31,15 @@ class HollowHeap:
             content     -> any type
 
     ********************************************
+    HollowHeap.set_content(heap_item, ct)    O(1)
+
+        Paramters:
+            heap_item   -> HeapItem
+            ct          -> any item
+        Return:
+            None
+
+    ********************************************
     self.convert(iteral)                    O(N)
         - parameters:
             iteral      -> iterable
@@ -129,6 +138,9 @@ class HollowHeap:
         Return:
             item        -> HeapItem
         """
+        if type(key) != int:
+            return None
+
         e = _HeapItem(text=item_content)
         self.heap=_insert(e, key, self.heap)
         self.len += 1
@@ -142,8 +154,9 @@ class HollowHeap:
         Return:
             heap_item   -> HeapItem
         """
-
-        return _find_min(self.heap)
+        if self.heap != None:
+            return _find_min(self.heap)
+        return None
 
     def delete_min(self):
         """
@@ -152,8 +165,9 @@ class HollowHeap:
         Return:
             None
         """
-        self.heap=_delete_min(self.heap)
-        self.len -= 1
+        if self.heap != None:
+            self.heap=_delete_min(self.heap)
+            self.len -= 1
 
     def merge_heaps(self, heap, destroy=True):
         """
@@ -188,8 +202,9 @@ class HollowHeap:
             None
         """
 
-        assert(heap_item.node.key > key)
-        self.heap = _decrease_key(heap_item, key, self.heap)
+        if heap_item.node.key != key:
+            assert(heap_item.node.key > key)
+            self.heap = _decrease_key(heap_item, key, self.heap)
 
     def delete(self, heap_item):
         """
@@ -216,6 +231,19 @@ class HollowHeap:
             content     -> any type
         """
         return heap_item.text
+
+    @staticmethod
+    def set_content(heap_item, ct):
+        """
+        this function change the content inside a heap item
+
+        Paramters:
+            heap_item   -> HeapItem
+            ct          -> any type
+        Return:
+            None
+        """
+        heap_item.text = ct
 
     def __len__(self):
         return self.len
@@ -311,7 +339,10 @@ def _decrease_key(e,k,h):
     return _link(v,h)
 
 def _delete_min(h):
-    return _delete(h.item, h)
+    if h != None:
+        return _delete(h.item, h)
+    else:
+        return None
 
 def _destroy_node(n):
     n.item = None
@@ -347,7 +378,7 @@ def _do_unranked_link(A,max_rank):
 def _delete(e,h):
 
     if e is None:
-        return
+        return None
 
 
     e.node.item = None
@@ -388,67 +419,3 @@ def _delete(e,h):
                 max_rank = max(u.rank, max_rank)
 
     return _do_unranked_link(A, max_rank)
-
-
-
-
-# def _delete(e,h):
-#     e.node.item = None
-#     e.node = None
-    
-#     if h.item != None:      # not root deleteion
-#         return h
-
-#     # init
-#     max_rank = 0
-#     A = dict()
-#     L = [h]     # a queue
-
-#     # remove hollow nodes
-#     while len(L) != 0:
-#         # delete a node v from L, 
-#         # apply operations on each child u of v
-#         # destory v
-
-#         v = L.pop(0)
-#         u = v.child
-
-#         # 4 cases
-#         while u != None:
-#             # 1. u is hollow, and v is its only parent
-#             if u.item == None and u.extr_prt == None:
-#                 # add u to L
-#                 L.append(u)
-#                 u = u.next_sib
-#                 continue
-                
-#             # 2. v is the second parent
-#             if u.extr_prt != None:
-#                 if u.extr_prt is v:
-#                     # remove parent
-#                     u.extr_prt = None
-#                     # break
-#                     break
-                
-#                 else:
-#                     t = u.next_sib
-#                     u.extr_prt = None
-#                     u.next_sib = None
-#                     u = t
-#                     continue
-            
-#             if u.item != None:
-#                 # add u to A unless A contains a root of the same rank
-#                 if A.get(u.rank, None) != None:
-#                     # contains root of the same rank
-#                     k = _do_ranked_link(A,u)
-#                     max_rank = max(k.rank, max_rank)
-#                 else:
-#                     A[u.rank] = u
-#                     max_rank = max(u.rank, max_rank)
-#                 u = u.next_sib
-#                 continue
-        
-#     # L is empty
-#     # unranked links
-#     return _do_unranked_link(A,max_rank)
